@@ -1,34 +1,140 @@
 1) Create database alta_online_shop.
-Sulisi SQL:
+Sulisi SQL: CREATE DATABASE alta_online_shop;
+
 
 2) Dari schema Olshop yang telah kamu kerjakan di, Implementasikanlah menjadi table pada MySQL.
     2.a Create table user
-    Sulisi SQL:
+    Sulisi SQL: 
+CREATE TABLE alta_online_shop.user (
+    user_id SERIAL PRIMARY KEY,
+    nama VARCHAR(255) NOT NULL,
+    alamat TEXT,
+    tanggal_lahir DATE,
+    status_user VARCHAR(255) NOT NULL,
+    gender VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
     2.b Create table product, product_type, product_description, payment_method.
-    Sulisi SQL:
+    Sulisi SQL: 
+CREATE TABLE alta_online_shop.product (
+    product_id SERIAL PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE alta_online_shop.product_type (
+    product_type_id SERIAL PRIMARY KEY,
+    product_type VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE alta_online_shop.product_description (
+    product_description_id SERIAL PRIMARY KEY,
+    product_description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE alta_online_shop.payment_method (
+    payment_method_id SERIAL PRIMARY KEY,
+    payment_method VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
     3.c Create table transaction, transaction detail.
     Sulisi SQL:
+CREATE TABLE alta_online_shop.transaction (
+    transaction_id SERIAL PRIMARY KEY,
+    user_id INT,
+    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES alta_online_shop.user(user_id)
+);
+
+CREATE TABLE alta_online_shop.transaction_detail (
+    transaction_detail_id SERIAL PRIMARY KEY,
+    transaction_id INT,
+    product_id INT,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (transaction_id) REFERENCES alta_online_shop.transaction(transaction_id),
+    FOREIGN KEY (product_id) REFERENCES alta_online_shop.product(product_id)
+);
+
 
 3) Create table kurir dengan field id, name, created_at, updated_at.
 Sulisi SQL:
+CREATE TABLE alta_online_shop.kurir (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    ongkos_dasar DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 4) Tambahkan ongkos_dasar column di tabel kurir.
 Sulisi SQL:
+ALTER TABLE kurir
+ADD ongkos_dasar VARCHAR(255);
+
 
 5) Rename tabel kurir menjadi shipping.
 Sulisi SQL:
+ALTER TABLE alta_online_shop.kurir RENAME TO shipping;
+
 
 6) Hapus / Drop tabel shipping karena ternyata tidak dibutuhkan.
 Sulisi SQL:
+DROP TABLE IF EXISTS alta_online_shop.shipping;
+
 
 7) Silahkan menambahkan entity baru dengan relation 1-to-1, 1-to-many, many-to-many. Seperti:
     7.a) 1-to-1: payment_method dengan description.
     Sulisi SQL:
+CREATE TABLE alta_online_shop.description (
+    description_id SERIAL PRIMARY KEY,
+    payment_method_id INT UNIQUE,
+    description_text TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (payment_method_id) REFERENCES alta_online_shop.payment_method(payment_method_id)
+);
+
 
     7.b) 1-to-many: user dengan alamat.
     Sulisi SQL:
+ALTER TABLE alta_online_shop.user
+ADD COLUMN orders_id INT;
+
+CREATE TABLE alta_online_shop.orders (
+    order_id SERIAL PRIMARY KEY,
+    user_id INT,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10, 0) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES alta_online_shop.user(user_id)
+);
+
 
     7.c) many-to-many: user dengan payment_method menjadi user_payment_method_detail.
     Sulisi SQL:
+CREATE TABLE alta_online_shop.user_payment_method_detail (
+    user_payment_method_detail SERIAL PRIMARY KEY,
+    user_id INT,
+    payment_method_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES alta_online_shop.user(user_id),
+    FOREIGN KEY (payment_method_id) REFERENCES alta_online_shop.payment_method(payment_method_id)
+);
